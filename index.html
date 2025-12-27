@@ -674,7 +674,7 @@
 
         .project-card img {
             width: 100%;
-            height: 220px;
+            height: 500px;
             object-fit: cover;
         }
 
@@ -715,8 +715,8 @@
 
         .popup-content {
             background: white;
-            max-width: 800px;
-            width: 90%;
+            max-width: 1200px;
+            width: 95%;
             border-radius: 15px;
             padding: 35px;
             position: relative;
@@ -746,8 +746,17 @@
 
         .popup-images img {
             max-width: 100%;
+            width: 100%;
+            max-height: 70vh;
             border-radius: 8px;
+            object-fit: contain;
         }
+
+            .popup-images .achievement-image-container {
+                height: auto;
+                min-height: 400px;
+                max-height: 70vh;
+            }
 
         /* Achievements */
         #achievements {
@@ -781,6 +790,10 @@
             width: 100%;
             height: 200px;
             overflow: hidden;
+        }
+
+        .project-card .achievement-image-container {
+            height: 500px;
         }
 
         .achievement-image-container img {
@@ -1942,7 +1955,19 @@
         const projectsData = [
             {
                 title: { en: 'AI-Calendar', vi: 'Thời khoá biểu tích hợp AI' },
-                desc: { en: 'Developed a website that integrates AI to optimize timetable scheduling for high schools and provide personalized study plans for university students.', vi: 'Phát triển website ứng dụng AI để tối ưu thời khóa biểu cho học sinh cấp 3 và xây dựng kế hoạch học tập cá nhân cho sinh viên.' },
+                desc: { en: 'Developed a website that integrates AI provide personalized study plans for university students.', vi: 'Phát triển website ứng dụng AI để xây dựng kế hoạch học tập cá nhân cho sinh viên.' },
+                image: 'port_deakin1.JPEG',
+                images: [
+                    'port_deakin1.JPEG',
+                    'port_deakin2.JPEG',
+                    'port_deakin3.JPEG',
+                    'port_deakin4.JPEG'
+                ],
+                tools: ['Mathematical Algorithms', 'Figma']
+            },
+            {
+                title: { en: 'AI-Calendar', vi: 'Thời khoá biểu tích hợp AI' },
+                desc: { en: 'Developed a website that integrates AI provide personalized study plans for university students.', vi: 'Phát triển website ứng dụng AI để xây dựng kế hoạch học tập cá nhân cho sinh viên.' },
                 image: 'port_deakin1.JPEG',
                 images: [
                     'port_deakin1.JPEG',
@@ -1965,7 +1990,7 @@
             // build images html (use project.images if available, otherwise fallback to project.image)
             const imgs = Array.isArray(project.images) && project.images.length ? project.images : (project.image ? [project.image] : []);
             const imagesHtml = imgs.map((img, i) => `
-                <img src="${img}" alt="${project.title[lang]}" class="${i === 0 ? 'active' : ''}" data-index="${i}" style="display: ${i === 0 ? 'block' : 'none'}; width:100%; height:100%; object-fit:cover;">
+                <img src="${img}" alt="${project.title[lang]}" class="${i === 0 ? 'active' : ''}" data-index="${i}" style="display: ${i === 0 ? 'block' : 'none'}; width:100%; height: 100%; object-fit:cover;">
             `).join('');
 
             card.innerHTML = `
@@ -2000,7 +2025,7 @@
 
             const imgs = Array.isArray(project.images) && project.images.length ? project.images : (project.image ? [project.image] : []);
             const imagesHtml = imgs.map((img, i) => `
-                <img src="${img}" alt="${project.title[lang]}" class="${i === 0 ? 'active' : ''}" data-index="${i}" style="display: ${i === 0 ? 'block' : 'none'}; max-width:200%; max-height:80vh; object-fit:cover;">
+                <img src="${img}" alt="${project.title[lang]}" class="${i === 0 ? 'active' : ''}" data-index="${i}" style="display: ${i === 0 ? 'block' : 'none'}; max-width:100%; max-height:70vh; object-fit:contain;">
             `).join('');
 
             // Wrap popup images/content inside an achievement-card so it reuses the same styles
@@ -2009,7 +2034,7 @@
                 <div class="achievement-card popup-achievement ${hasMultiple ? 'has-multiple' : ''}" style="box-shadow:none; background:transparent;">
                     <h2 style="color: var(--wine-red); margin-bottom: 15px;">${project.title[lang]}</h2>
                     <p style="font-size: 15px; margin-bottom: 15px; color: var(--gray);">${project.desc[lang]}</p>
-                    <div class="achievement-image-container popup-images">
+                    <div class="achievement-image-container popup-images" style="height: auto; min-height: 200px; max-height: 70vh; overflow: visible;">
                         ${imagesHtml}
                         <button class="achievement-nav prev" onclick="changeProjectPopupImage(-1)"><i class="fas fa-chevron-left"></i></button>
                         <button class="achievement-nav next" onclick="changeProjectPopupImage(1)"><i class="fas fa-chevron-right"></i></button>
