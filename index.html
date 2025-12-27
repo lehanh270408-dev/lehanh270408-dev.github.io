@@ -1942,28 +1942,54 @@
         const projectsData = [
             {
                 title: { en: 'AI-Calendar', vi: 'Thời khoá biểu tích hợp AI' },
-                desc: { en: 'Developed a website that integrates AI to optimize timetable scheduling for high schools and develop personalized study plans for university students', vi: 'Phát triển Website ứng dụng AI trong tạo thời khoá biểu cấp 3 và tối ưu lịch học cho sinh viên.' },
-                image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400"%3E%3Crect fill="%238B4049" width="800" height="400"/%3E%3Ctext x="400" y="200" font-size="36" text-anchor="middle" fill="white"%3EWorkshop%3C/text%3E%3C/svg%3E',
+                desc: { en: 'Developed a website that integrates AI to optimize timetable scheduling for high schools and provide personalized study plans for university students.', vi: 'Phát triển website ứng dụng AI để tối ưu thời khóa biểu cho học sinh cấp 3 và xây dựng kế hoạch học tập cá nhân cho sinh viên.' },
+                image: 'port_deakin1.JPEG',
+                images: [
+                    'port_deakin1.JPEG',
+                    'port_deakin2.JPEG',
+                    'port_deakin3.JPEG',
+                    'port_deakin4.JPEG'
+                ],
                 tools: ['Mathematical Algorithms', 'Figma']
             }
         ];
 
-        // Render Projects
+        // Render Projects (with image gallery + nav)
         const projectsGrid = document.getElementById('projectsGrid');
-        projectsData.forEach((project) => {
+        projectsData.forEach((project, index) => {
             const lang = body.classList.contains('vi') ? 'vi' : 'en';
             const card = document.createElement('div');
-            card.className = 'project-card';
+            // give project cards the achievement styles so nav buttons and layout match
+            card.className = 'project-card achievement-card';
             
+            // build images html (use project.images if available, otherwise fallback to project.image)
+            const imgs = Array.isArray(project.images) && project.images.length ? project.images : (project.image ? [project.image] : []);
+            const imagesHtml = imgs.map((img, i) => `
+                <img src="${img}" alt="${project.title[lang]}" class="${i === 0 ? 'active' : ''}" data-index="${i}" style="display: ${i === 0 ? 'block' : 'none'}; width:100%; height:100%; object-fit:cover;">
+            `).join('');
+
             card.innerHTML = `
-                <img src="${project.image}" alt="${project.title[lang]}">
+                <div class="achievement-image-container">
+                    ${imagesHtml}
+                    <button class="achievement-nav prev" onclick="changeProjectImage(${index}, -1)"><i class="fas fa-chevron-left"></i></button>
+                    <button class="achievement-nav next" onclick="changeProjectImage(${index}, 1)"><i class="fas fa-chevron-right"></i></button>
+                </div>
                 <div class="project-info">
                     <h3><span class="en-text">${project.title.en}</span><span class="vi-text" style="display: none;">${project.title.vi}</span></h3>
                     <p><span class="en-text">${project.desc.en}</span><span class="vi-text" style="display: none;">${project.desc.vi}</span></p>
                 </div>
             `;
-            
-            card.addEventListener('click', () => showProjectPopup(project));
+
+            if (imgs.length > 1) {
+                card.classList.add('has-multiple');
+            }
+
+            card.addEventListener('click', (e) => {
+                // prevent card click when clicking nav buttons
+                if (e.target.closest('.achievement-nav')) return;
+                showProjectPopup(project, index);
+            });
+
             projectsGrid.appendChild(card);
         });
 
@@ -1971,21 +1997,32 @@
         function showProjectPopup(project) {
             const popup = document.getElementById('projectPopup');
             const lang = body.classList.contains('vi') ? 'vi' : 'en';
-            
+
+            const imgs = Array.isArray(project.images) && project.images.length ? project.images : (project.image ? [project.image] : []);
+            const imagesHtml = imgs.map((img, i) => `
+                <img src="${img}" alt="${project.title[lang]}" class="${i === 0 ? 'active' : ''}" data-index="${i}" style="display: ${i === 0 ? 'block' : 'none'}; max-width:200%; max-height:80vh; object-fit:cover;">
+            `).join('');
+
+            // Wrap popup images/content inside an achievement-card so it reuses the same styles
+            const hasMultiple = imgs.length > 1;
             document.getElementById('popupBody').innerHTML = `
-                <h2 style="color: var(--wine-red); margin-bottom: 15px;">${project.title[lang]}</h2>
-                <p style="font-size: 15px; margin-bottom: 15px; color: var(--gray);">${project.desc[lang]}</p>
-                <div class="popup-images">
-                    <img src="${project.image}" alt="${project.title[lang]}">
-                </div>
-                <div style="margin-top: 25px;">
-                    <h4 style="color: var(--wine-red); margin-bottom: 12px;">${lang === 'vi' ? 'Công cụ sử dụng:' : 'Tools Used:'}</h4>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        ${project.tools.map(tool => `<span style="background: var(--blush); padding: 6px 12px; border-radius: 15px; font-weight: 500; font-size: 13px;">${tool}</span>`).join('')}
+                <div class="achievement-card popup-achievement ${hasMultiple ? 'has-multiple' : ''}" style="box-shadow:none; background:transparent;">
+                    <h2 style="color: var(--wine-red); margin-bottom: 15px;">${project.title[lang]}</h2>
+                    <p style="font-size: 15px; margin-bottom: 15px; color: var(--gray);">${project.desc[lang]}</p>
+                    <div class="achievement-image-container popup-images">
+                        ${imagesHtml}
+                        <button class="achievement-nav prev" onclick="changeProjectPopupImage(-1)"><i class="fas fa-chevron-left"></i></button>
+                        <button class="achievement-nav next" onclick="changeProjectPopupImage(1)"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div style="margin-top: 25px;">
+                        <h4 style="color: var(--wine-red); margin-bottom: 12px;">${lang === 'vi' ? 'Công cụ sử dụng:' : 'Tools Used:'}</h4>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            ${project.tools && project.tools.length ? project.tools.map(tool => `<span style="background: var(--blush); padding: 6px 12px; border-radius: 15px; font-weight: 500; font-size: 13px;">${tool}</span>`).join('') : ''}
+                        </div>
                     </div>
                 </div>
             `;
-            
+
             popup.classList.add('active');
         }
 
@@ -2060,7 +2097,7 @@
             }
             
             const imagesHtml = achievement.images.map((img, i) => 
-                `<img src="${img}" alt="${achievement.title[lang]}" class="${i === 0 ? 'active' : ''}" data-index="${i}">`
+                `<img src="${img}" alt="${achievement.title[lang]}" class="${i === 0 ? 'active' : ''}" data-index="${i}" style="display: ${i === 0 ? 'block' : 'none'}; width:100%; height:100%; object-fit:cover;">`
             ).join('');
             
             card.innerHTML = `
@@ -2081,17 +2118,74 @@
         // Change achievement image function
         window.changeAchievementImage = function(cardIndex, direction) {
             const card = achievementsGrid.children[cardIndex];
+            if (!card) return;
             const container = card.querySelector('.achievement-image-container');
-            const images = container.querySelectorAll('img');
-            const currentIndex = Array.from(images).findIndex(img => img.classList.contains('active'));
-            
-            images[currentIndex].classList.remove('active');
-            
+            if (!container) return;
+            const images = Array.from(container.querySelectorAll('img'));
+            if (!images.length) return;
+
+            let currentIndex = images.findIndex(img => img.classList.contains('active'));
+            if (currentIndex === -1) currentIndex = 0;
+
+            images.forEach(img => {
+                img.classList.remove('active');
+                img.style.display = 'none';
+            });
+
             let newIndex = currentIndex + direction;
             if (newIndex < 0) newIndex = images.length - 1;
             if (newIndex >= images.length) newIndex = 0;
-            
+
             images[newIndex].classList.add('active');
+            images[newIndex].style.display = 'block';
+        };
+
+        // Change project card image function
+        window.changeProjectImage = function(cardIndex, direction) {
+            const card = projectsGrid.children[cardIndex];
+            if (!card) return;
+            const container = card.querySelector('.achievement-image-container');
+            if (!container) return;
+            const images = Array.from(container.querySelectorAll('img'));
+            if (!images.length) return;
+
+            let currentIndex = images.findIndex(img => img.classList.contains('active'));
+            if (currentIndex === -1) currentIndex = 0;
+
+            images.forEach(img => {
+                img.classList.remove('active');
+                img.style.display = 'none';
+            });
+
+            let newIndex = currentIndex + direction;
+            if (newIndex < 0) newIndex = images.length - 1;
+            if (newIndex >= images.length) newIndex = 0;
+
+            images[newIndex].classList.add('active');
+            images[newIndex].style.display = 'block';
+        };
+
+        // Change project images inside popup
+        window.changeProjectPopupImage = function(direction) {
+            const container = document.querySelector('#popupBody .popup-images');
+            if (!container) return;
+            const images = Array.from(container.querySelectorAll('img'));
+            if (!images.length) return;
+
+            let currentIndex = images.findIndex(img => img.classList.contains('active'));
+            if (currentIndex === -1) currentIndex = 0;
+
+            images.forEach(img => {
+                img.classList.remove('active');
+                img.style.display = 'none';
+            });
+
+            let newIndex = currentIndex + direction;
+            if (newIndex < 0) newIndex = images.length - 1;
+            if (newIndex >= images.length) newIndex = 0;
+
+            images[newIndex].classList.add('active');
+            images[newIndex].style.display = 'block';
         };
 
         // Portfolio Data
